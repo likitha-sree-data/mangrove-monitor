@@ -1,0 +1,37 @@
+
+version: 2
+
+models:
+  - name: stg_fao_annual_area
+    description: >
+      Cleaned and typed FAO mangrove area statistics.
+      Source: FAO World's Mangroves 2000-2020 (2023).
+      Covers 15 countries across 6 regions from 1996 to 2020.
+    columns:
+      - name: load_id
+        description: Unique row identifier from raw layer
+        tests:
+          - unique
+          - not_null
+      - name: country_code
+        description: ISO 3166-1 alpha-3 country code
+        tests:
+          - not_null
+      - name: year
+        description: Reference year
+        tests:
+          - not_null
+      - name: area_ha
+        description: Total mangrove area in hectares
+        tests:
+          - not_null
+      - name: net_change_ha
+        description: Net area change in hectares (negative = loss)
+      - name: net_change_pct
+        description: Net area change as percentage of total area
+      - name: dq_flag
+        description: Data quality flag
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['VALID','MISSING_AREA','YEAR_OUT_OF_RANGE','NEGATIVE_AREA']

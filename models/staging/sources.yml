@@ -1,0 +1,18 @@
+
+version: 2
+sources:
+  - name: raw
+    database: MANGROVE_MONITOR
+    schema: RAW
+    tables:
+      - name: FAO_ANNUAL_AREA
+        description: Raw FAO mangrove area statistics by country and year
+        columns:
+          - name: LOAD_ID
+            tests: [unique, not_null]
+          - name: COUNTRY_CODE
+            tests: [not_null]
+          - name: YEAR
+            tests: [not_null]
+          - name: AREA_HA
+            tests: [not_null]

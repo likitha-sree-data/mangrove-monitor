@@ -1,0 +1,29 @@
+
+version: 2
+
+models:
+  - name: mart_loss_by_country
+    description: >
+      Final analytics table with mangrove loss metrics by country and year.
+      Includes carbon stock estimates, flood protection values, and loss severity buckets.
+      Materialized as TABLE for fast Streamlit queries.
+    columns:
+      - name: country_code
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
+      - name: loss_severity
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['UNKNOWN','STABLE_OR_GAINING','LOW_LOSS','MODERATE_LOSS','HIGH_LOSS','CRITICAL_LOSS']
+
+  - name: mart_loss_by_region
+    description: Regional aggregation of mangrove loss metrics by year.
+
+  - name: mart_global_summary
+    description: >
+      Global totals by year including real loss_ha_per_second rate
+      derived from actual data. Powers the live counter in the Streamlit dashboard.
