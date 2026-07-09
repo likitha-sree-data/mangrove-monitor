@@ -119,6 +119,22 @@ try:
         opacity=0.8,
         hovertemplate="Year: %{x}<br>Loss: %{y:,.0f} ha<extra></extra>"
     ))
+    fig.add_annotation(
+        x=2000,
+        y=float(trend_df[trend_df["YEAR"]==2000]["GLOBAL_LOSS_HA"].values[0]),
+        text="46,700 ha/yr<br>1990-2000 avg",
+        showarrow=True, arrowhead=2, arrowcolor="#6a6760",
+        font=dict(size=9, family="IBM Plex Mono", color="#6a6760"),
+        ax=0, ay=-45
+    )
+    fig.add_annotation(
+        x=2020,
+        y=float(trend_df[trend_df["YEAR"]==2020]["GLOBAL_LOSS_HA"].values[0]),
+        text="21,200 ha/yr<br>2010-2020 · -54%",
+        showarrow=True, arrowhead=2, arrowcolor="#1a6b3c",
+        font=dict(size=9, family="IBM Plex Mono", color="#1a6b3c"),
+        ax=50, ay=-45
+    )
     fig.update_layout(
         plot_bgcolor="#ffffff",
         paper_bgcolor="#f8f7f4",
@@ -131,6 +147,34 @@ try:
     )
     st.plotly_chart(fig, use_container_width=True)
 
+
+    st.markdown('<p class="rule">Regional breakdown · 2020</p>', unsafe_allow_html=True)
+    r2020 = rdf[rdf["YEAR"]==2020].copy()
+    left, right = st.columns([3,2])
+    with left:
+        fig2 = px.bar(
+            r2020.sort_values("TOTAL_AREA_HA"),
+            x="TOTAL_AREA_HA", y="REGION", orientation="h",
+            color="AVG_NET_CHANGE_PCT",
+            color_continuous_scale=["#b83220","#f0ede8","#1a6b3c"],
+            color_continuous_midpoint=0,
+            labels={"TOTAL_AREA_HA":"Area (ha)","REGION":"","AVG_NET_CHANGE_PCT":"Net chg %"}
+        )
+        fig2.update_layout(
+            plot_bgcolor="#ffffff", paper_bgcolor="#f8f7f4",
+            font=dict(family="IBM Plex Mono",size=10,color="#6a6760"),
+            height=260, margin=dict(l=0,r=0,t=8,b=0),
+            xaxis=dict(tickformat=",d",showgrid=True,gridcolor="#e8e6e0"),
+            coloraxis_colorbar=dict(thickness=10,len=0.7,tickfont=dict(size=9))
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+    with right:
+        disp_r = r2020[["REGION","TOTAL_AREA_HA","TOTAL_LOSS_HA","AVG_NET_CHANGE_PCT","DOMINANT_DRIVER"]].copy()
+        disp_r.columns = ["Region","Area (ha)","Loss (ha)","Chg %","Driver"]
+        disp_r["Area (ha)"] = disp_r["Area (ha)"].apply(lambda x: f"{x:,.0f}")
+        disp_r["Loss (ha)"] = disp_r["Loss (ha)"].apply(lambda x: f"{x:,.0f}")
+        disp_r["Chg %"]     = disp_r["Chg %"].apply(lambda x: f"{x:.3f}%")
+        st.dataframe(disp_r, use_container_width=True, height=260, hide_index=True)
     st.markdown('<p class="rule">Country snapshot · most recent year per country</p>', unsafe_allow_html=True)
     fc1,fc2,_ = st.columns([1,1,3])
     with fc1:
@@ -171,7 +215,12 @@ Built by <a href="https://linkedin.com/in/likitha-sree" style="color:#6a6760">Li
 Pipeline: Python &middot; Snowflake &middot; dbt &middot; Streamlit &middot; Last updated: {now_str}
 </div>''', unsafe_allow_html=True)
 
-    time.sleep(60)
+    # Auto-refresh every 60 seconds
+    refresh_placeholder = st.empty()
+    with refresh_placeholder:
+        for remaining in range(60, 0, -1):
+            refresh_placeholder.caption(f"Auto-refreshing in {remaining}s · {datetime.now().strftime('%H:%M:%S UTC')}")
+            time.sleep(1)
     st.rerun()
 
 except Exception as e:
