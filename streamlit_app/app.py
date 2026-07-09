@@ -30,7 +30,8 @@ def get_conn():
         password=st.secrets["snowflake"]["password"],
         warehouse=st.secrets["snowflake"]["warehouse"],
         database=st.secrets["snowflake"]["database"],
-        role=st.secrets["snowflake"]["role"]
+        role  = st.secrets["snowflake"]["role"],
+        client_session_keep_alive = True
     )
 
 @st.cache_data(ttl=3600)
