@@ -17,7 +17,7 @@ regional as (
             sum(net_change_ha) / nullif(sum(area_ha), 0) * 100
         , 4)                                as avg_net_change_pct,
         mode(primary_driver)                as dominant_driver,
-        current_timestamp()                 as dbt_updated_at
+        current_timestamp                 as dbt_updated_at
     from country_data
     where dq_flag = 'VALID'
     group by region, year
