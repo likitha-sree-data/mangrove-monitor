@@ -35,31 +35,40 @@ def get_conn():
 
 @st.cache_data(ttl=3600)
 def load_global():
-    return get_conn().execute("""
+    df = get_conn().execute("""
         SELECT YEAR, GLOBAL_AREA_HA, GLOBAL_LOSS_HA,
                GLOBAL_NET_CHANGE_HA, LOSS_HA_PER_SECOND
         FROM MANGROVE_MONITOR.STAGING_MART.MART_GLOBAL_SUMMARY
         WHERE GLOBAL_LOSS_HA IS NOT NULL ORDER BY YEAR
     """).fetch_df()
+    # DuckDB returns unquoted column names lowercase by default, Snowflake
+    # returned them uppercase. Normalize here, once, rather than touching
+    # every column reference below.
+    df.columns = df.columns.str.upper()
+    return df
 
 @st.cache_data(ttl=3600)
 def load_countries():
-    return get_conn().execute("""
+    df = get_conn().execute("""
         SELECT COUNTRY_CODE, COUNTRY_NAME, REGION, YEAR, AREA_HA,
                NET_CHANGE_HA, NET_CHANGE_PCT, LOSS_SEVERITY,
                CARBON_STOCK_TONNES, FLOOD_PROTECTION_USD, PRIMARY_DRIVER
         FROM MANGROVE_MONITOR.STAGING_MART.MART_LOSS_BY_COUNTRY
         WHERE IS_LATEST_SNAPSHOT = TRUE ORDER BY AREA_HA DESC
     """).fetch_df()
+    df.columns = df.columns.str.upper()
+    return df
 
 @st.cache_data(ttl=3600)
 def load_regional():
-    return get_conn().execute("""
+    df = get_conn().execute("""
         SELECT REGION, YEAR, TOTAL_AREA_HA, TOTAL_LOSS_HA,
                AVG_NET_CHANGE_PCT, DOMINANT_DRIVER
         FROM MANGROVE_MONITOR.STAGING_MART.MART_LOSS_BY_REGION
         ORDER BY YEAR, TOTAL_AREA_HA DESC
     """).fetch_df()
+    df.columns = df.columns.str.upper()
+    return df
 
 def live_counts(rate):
     T0 = datetime(2025, 1, 1, tzinfo=timezone.utc)
