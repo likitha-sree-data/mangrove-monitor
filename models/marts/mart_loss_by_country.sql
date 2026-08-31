@@ -44,7 +44,7 @@ final as (
             when w.net_change_pct >= -5     then 'HIGH_LOSS'
             else                                 'CRITICAL_LOSS'
         end as loss_severity,
-        current_timestamp() as dbt_updated_at
+        current_timestamp as dbt_updated_at
     from with_carbon w
     left join latest_year l on w.country_code = l.country_code
 )
