@@ -210,9 +210,9 @@ try:
     with st.expander("Methodology and data sources"):
         m1,m2 = st.columns(2)
         with m1:
-            st.code("Loss rate : 33,850 ha/yr / 31,557,600 sec = 0.001073 ha/sec\nSource    : FAO 2023 (677,000 ha / 20 yr)\nCarbon    : area_ha x 394 t C/ha (GMA 2024)\nFlood     : area_ha x $57,770 (World Bank 2024)\nJuveniles : area_ha x 54,054/ha/yr (GMA 2024)\nCoastline : area_ha x 10 m (IUCN 2024)")
+            st.code("Loss rate : 21,200 ha/yr / 31,557,600 sec = 0.000672 ha/sec\nSource    : FAO FRA 2020, Table 31 (2010-2020 decade average)\nCarbon    : area_ha x 394 t C/ha (GMA 2024)\nFlood     : area_ha x $57,770 (World Bank 2024)\nJuveniles : area_ha x 54,054/ha/yr (GMA 2024)\nCoastline : area_ha x 10 m (IUCN 2024)")
         with m2:
-            st.markdown("**Caveats:** All counters are projections not measurements. The 33,850 ha/yr is a 20-year average. Actual current rate is lower: 46,700 ha/yr (1990-2000) falling to 21,200 ha/yr (2010-2020), a 54% reduction.")
+            st.markdown("**Caveats:** All counters are projections, not a live feed, based on FAO's most recently reported decadal average. The rate has fallen sharply over three decades: 46,700 ha/yr (1990-2000) to 36,300 ha/yr (2000-2010) to 21,200 ha/yr (2010-2020), a 54% decrease.")
             st.markdown("**Pipeline:** Python ingestion → DuckDB RAW → dbt STAGING → dbt MART → Streamlit")
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M UTC")
