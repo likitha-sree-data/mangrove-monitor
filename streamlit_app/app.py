@@ -1,5 +1,5 @@
 import streamlit as st
-import snowflake.connector
+import duckdb
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -22,45 +22,44 @@ h2{font-family:'IBM Plex Sans',sans-serif!important;font-weight:300!important;le
 .footer{font-family:'IBM Plex Mono',monospace;font-size:.54rem;color:#a09d98;line-height:2;border-top:1px solid #d4d1c8;padding-top:14px;margin-top:36px}
 </style>""", unsafe_allow_html=True)
 
+# DuckDB replaces Snowflake entirely. This is a local file built by the
+# ingestion + dbt step in CI and committed to the repo, no account, no
+# credentials, no network call, no billing surface of any kind.
+# Name the file MANGROVE_MONITOR.duckdb so the catalog name matches the
+# existing three-part table references below with zero SQL changes.
+DB_PATH = "warehouse/MANGROVE_MONITOR.duckdb"
+
 @st.cache_resource
 def get_conn():
-    return snowflake.connector.connect(
-        account=st.secrets["snowflake"]["account"],
-        user=st.secrets["snowflake"]["user"],
-        password=st.secrets["snowflake"]["password"],
-        warehouse=st.secrets["snowflake"]["warehouse"],
-        database=st.secrets["snowflake"]["database"],
-        role  = st.secrets["snowflake"]["role"],
-        client_session_keep_alive = True
-    )
+    return duckdb.connect(DB_PATH, read_only=True)
 
 @st.cache_data(ttl=3600)
 def load_global():
-    return pd.read_sql("""
+    return get_conn().execute("""
         SELECT YEAR, GLOBAL_AREA_HA, GLOBAL_LOSS_HA,
                GLOBAL_NET_CHANGE_HA, LOSS_HA_PER_SECOND
         FROM MANGROVE_MONITOR.STAGING_MART.MART_GLOBAL_SUMMARY
         WHERE GLOBAL_LOSS_HA IS NOT NULL ORDER BY YEAR
-    """, get_conn())
+    """).fetch_df()
 
 @st.cache_data(ttl=3600)
 def load_countries():
-    return pd.read_sql("""
+    return get_conn().execute("""
         SELECT COUNTRY_CODE, COUNTRY_NAME, REGION, YEAR, AREA_HA,
                NET_CHANGE_HA, NET_CHANGE_PCT, LOSS_SEVERITY,
                CARBON_STOCK_TONNES, FLOOD_PROTECTION_USD, PRIMARY_DRIVER
         FROM MANGROVE_MONITOR.STAGING_MART.MART_LOSS_BY_COUNTRY
         WHERE IS_LATEST_SNAPSHOT = TRUE ORDER BY AREA_HA DESC
-    """, get_conn())
+    """).fetch_df()
 
 @st.cache_data(ttl=3600)
 def load_regional():
-    return pd.read_sql("""
+    return get_conn().execute("""
         SELECT REGION, YEAR, TOTAL_AREA_HA, TOTAL_LOSS_HA,
                AVG_NET_CHANGE_PCT, DOMINANT_DRIVER
         FROM MANGROVE_MONITOR.STAGING_MART.MART_LOSS_BY_REGION
         ORDER BY YEAR, TOTAL_AREA_HA DESC
-    """, get_conn())
+    """).fetch_df()
 
 def live_counts(rate):
     T0 = datetime(2025, 1, 1, tzinfo=timezone.utc)
@@ -205,7 +204,7 @@ try:
             st.code("Loss rate : 33,850 ha/yr / 31,557,600 sec = 0.001073 ha/sec\nSource    : FAO 2023 (677,000 ha / 20 yr)\nCarbon    : area_ha x 394 t C/ha (GMA 2024)\nFlood     : area_ha x $57,770 (World Bank 2024)\nJuveniles : area_ha x 54,054/ha/yr (GMA 2024)\nCoastline : area_ha x 10 m (IUCN 2024)")
         with m2:
             st.markdown("**Caveats:** All counters are projections not measurements. The 33,850 ha/yr is a 20-year average. Actual current rate is lower: 46,700 ha/yr (1990-2000) falling to 21,200 ha/yr (2010-2020), a 54% reduction.")
-            st.markdown("**Pipeline:** Python ingestion → Snowflake RAW → dbt STAGING → dbt MART → Streamlit")
+            st.markdown("**Pipeline:** Python ingestion → DuckDB RAW → dbt STAGING → dbt MART → Streamlit")
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M UTC")
     st.markdown(f'''<div class="footer">
@@ -213,7 +212,7 @@ Data: FAO 2023 &middot; GMA 2024 &middot; UC Santa Cruz/World Bank 2024 &middot;
 Built by <a href="https://linkedin.com/in/likitha-sree" style="color:#6a6760">Likitha Sree Yarabarla</a>
 &middot; Climate Data Engineer &middot;
 <a href="https://github.com/likitha-sree-data/mangrove-monitor" style="color:#6a6760">github.com/likitha-sree-data/mangrove-monitor</a><br>
-Pipeline: Python &middot; Snowflake &middot; dbt &middot; Streamlit &middot; Last updated: {now_str}
+Pipeline: Python &middot; DuckDB &middot; dbt &middot; Streamlit &middot; Last updated: {now_str}
 </div>''', unsafe_allow_html=True)
 
     # Auto-refresh every 60 seconds
