@@ -1,6 +1,6 @@
 
 with source as (
-    select * from {{ source('raw', 'FAO_ANNUAL_AREA') }}
+    select * from {{ ref('fao_annual_area_seed') }}
 ),
 cleaned as (
     select
