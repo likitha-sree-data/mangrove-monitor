@@ -1,0 +1,40 @@
+name: Refresh mangrove data warehouse
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-warehouse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt-duckdb
+        run: pip install dbt-duckdb
+
+      - name: Make sure the warehouse folder exists
+        run: mkdir -p warehouse
+
+      - name: Load seeds and build models
+        run: |
+          dbt seed --profiles-dir .
+          dbt run --profiles-dir .
+
+      - name: Commit refreshed warehouse file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add warehouse/MANGROVE_MONITOR.duckdb
+          git diff --cached --quiet || git commit -m "Automated: refresh mangrove data warehouse"
+          git push
