@@ -1,0 +1,8 @@
+mangrove_monitor:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: warehouse/MANGROVE_MONITOR.duckdb
+      schema: STAGING
+      threads: 1
