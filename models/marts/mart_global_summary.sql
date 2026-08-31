@@ -15,7 +15,7 @@ global_by_year as (
         round(
             sum(total_loss_ha) / 365.25 / 24 / 3600
         , 8)                                   as loss_ha_per_second,
-        current_timestamp()                    as dbt_updated_at
+        current_timestamp                    as dbt_updated_at
     from regional
     group by year
 )
