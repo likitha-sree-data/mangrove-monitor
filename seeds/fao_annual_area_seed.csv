@@ -1,0 +1,4 @@
+load_id,country_code,country_name,region,year,area_ha,loss_ha,gain_ha,area_change_ha,primary_driver,source_file,loaded_at
+1,GLB,World (temporary aggregate; country-level breakdown pending),UNALLOCATED_GLOBAL,2000,15084000,,,,AQUACULTURE,fao_worlds_mangroves_2000_2020_manual,2026-08-30
+2,GLB,World (temporary aggregate; country-level breakdown pending),UNALLOCATED_GLOBAL,2010,14902000,,,-182000,AQUACULTURE,fao_worlds_mangroves_2000_2020_manual,2026-08-30
+3,GLB,World (temporary aggregate; country-level breakdown pending),UNALLOCATED_GLOBAL,2020,14800000,33850,19650,-102000,AQUACULTURE,fao_worlds_mangroves_2000_2020_manual,2026-08-30
