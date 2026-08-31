@@ -1,4 +1,9 @@
 load_id,country_code,country_name,region,year,area_ha,loss_ha,gain_ha,area_change_ha,primary_driver,source_file,loaded_at
 1,GLB,World (temporary aggregate; country-level breakdown pending),UNALLOCATED_GLOBAL,2000,15084000,46700,,,AQUACULTURE,fao_fra_2020_table31_manual,2026-08-30
 2,GLB,World (temporary aggregate; country-level breakdown pending),UNALLOCATED_GLOBAL,2010,14902000,36300,,-182000,AQUACULTURE,fao_fra_2020_table31_manual,2026-08-30
-3,GLB,World (temporary aggregate; country-level breakdown pending),UNALLOCATED_GLOBAL,2020,14800000,21200,19650,-102000,AQUACULTURE,fao_fra_2020_table31_manual,2026-08-30
+3,GLB,Rest of world (remainder after named countries below),UNALLOCATED_GLOBAL,2020,7844000,21200,19650,-102000,AQUACULTURE,fao_fra_2020_table31_manual,2026-08-30
+4,IDN,Indonesia,SOUTH_AND_SOUTHEAST_ASIA,2020,2812000,,,,,fao_fra_2020_top5_countries_manual,2026-08-30
+5,BRA,Brazil,SOUTH_AMERICA,2020,1332000,,,,,fao_fra_2020_top5_countries_manual,2026-08-30
+6,NGA,Nigeria,AFRICA,2020,1036000,,,,,fao_fra_2020_top5_countries_manual,2026-08-30
+7,MEX,Mexico,NORTH_AND_CENTRAL_AMERICA,2020,888000,,,,,fao_fra_2020_top5_countries_manual,2026-08-30
+8,AUS,Australia,OCEANIA,2020,888000,,,,,fao_fra_2020_top5_countries_manual,2026-08-30
